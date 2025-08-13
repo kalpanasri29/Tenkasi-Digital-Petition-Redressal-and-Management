@@ -72,6 +72,7 @@
 
         <!-- Public Form -->
         <div id="public-section" class="card">
+            <div id="submission-preview" class="hidden" style="margin-bottom:16px;"></div>
             <h2 style="margin-bottom: 16px; color: #2c3e50;" data-i18n="form.title">📝 New Petition/Complaint</h2>
             <form id="complaint-form">
                 <div class="form-group">
@@ -506,11 +507,29 @@
                 try{
                     await createSubmission(payload);
                     recordSubmission(phone);
-                    alert(`Submitted successfully. Reference ID: ${id}`);
-                    showSection('track');
-                    document.getElementById('track-phone').value = phoneRaw;
-                    document.getElementById('track-id').value = id;
-                    await trackByPhoneAndId();
+
+                    // Show inline preview and acknowledgement actions
+                    const previewBox = document.getElementById('submission-preview');
+                    const itemForPreview = { ...payload, timestamp: new Date().toISOString() };
+                    previewBox.classList.remove('hidden');
+                    previewBox.innerHTML = `
+                        <div class="ack">
+                            <div>Submitted successfully. Your reference ID is <strong>${id}</strong></div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="update-btn" onclick="downloadAcknowledgement('${id}')">Open Acknowledgement</button>
+                                <button class="update-btn secondary" onclick="navigator.clipboard && navigator.clipboard.writeText('${id}')">Copy ID</button>
+                            </div>
+                        </div>
+                        ${buildCard(itemForPreview, false)}
+                    `;
+                    previewBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Reset form for next submission
+                    this.reset();
+                    setType('complaint');
+                    selectedPhotos.length = 0;
+                    document.getElementById('photo-preview').innerHTML = '';
+                    setupLocationDropdowns();
                 }catch(err){ alert('Submission failed'); }
             });
         }
