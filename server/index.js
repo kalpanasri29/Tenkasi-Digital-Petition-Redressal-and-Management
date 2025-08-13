@@ -152,6 +152,15 @@ app.get('/api/submissions/lookup', async (req, res) => {
   }
 });
 
+// Get one by id
+app.get('/api/submissions/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const r = await pool.query('select * from submissions where id=$1 limit 1', [id]);
+    res.json(r.rows[0] || null);
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // Update status and response (officials)
 app.post('/api/submissions/:id/status', async (req, res) => {
   const { id } = req.params;

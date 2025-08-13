@@ -439,14 +439,15 @@
             }).join('');
             const resolved = item.resolved_at ? `<div style="font-size:12px;color:#065f46;">Resolved at: ${new Date(item.resolved_at).toLocaleString()}</div>` : '';
             const controls = showOfficialControls ? `
-                <div class="form-inline" style="margin-top:8px;">
-                    <select id="st-${item.id}" class="filter-select">
-                        ${getStatusOptions(item.type).map(s=>`<option value="${s.value}" ${item.status===s.value?'selected':''}>${s.label}</option>`).join('')}
-                    </select>
-                    <input type="text" id="resp-${item.id}" class="filter-select" placeholder="Acknowledgement / Response (optional)">
-                    <button class="update-btn" onclick="updateStatus('${item.id}')">Update</button>
-                    <button class="update-btn secondary" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button>
-                </div>` : `<div style="margin-top:8px;"><button class="update-btn" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button></div>`;
+        <div class="form-inline" style="margin-top:8px;">
+            <select id="st-${item.id}" class="filter-select">
+                ${getStatusOptions(item.type).map(s=>`<option value="${s.value}" ${item.status===s.value?'selected':''}>${s.label}</option>`).join('')}
+            </select>
+            <input type="text" id="resp-${item.id}" class="filter-select" placeholder="Acknowledgement / Response (optional)">
+            <button class="update-btn" onclick="updateStatus('${item.id}')">Update</button>
+            <button class="update-btn secondary" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button>
+        </div>
+        <div id="live-${item.id}" style="margin-top:8px;"></div>` : `<div style="margin-top:8px;"><button class="update-btn" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button></div>`;
             return `<div class="card" id="item-${item.id}">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                     <div style="font-weight:700;color:#2c3e50;">${item.id}</div>
@@ -608,9 +609,14 @@
             const status = document.getElementById(`st-${id}`).value;
             const response = document.getElementById(`resp-${id}`).value.trim();
             await setStatus(id, status, response || null);
+            // fetch latest for this id and render inline live preview
+            const latest = await fetch(`${API}/api/submissions/${id}`).then(r=>r.json());
+            const live = document.getElementById(`live-${id}`);
+            if (latest && live) {
+                live.innerHTML = `<div class=\"ack\"><div><strong>Updated:</strong> ${latest.status.replace('-', ' ')}</div><div>${latest.history?.length ? 'Events: '+latest.history.length : ''}</div></div>`;
+            }
             // After update, fetch again from server to ensure fresh data
             await Promise.all([displayAdminList(), loadDcdmList(), trackByPhoneAndId().catch(()=>{})]);
-            alert(`Updated ${id} to ${status}`);
         }
 
         async function trackByPhoneAndId(){
