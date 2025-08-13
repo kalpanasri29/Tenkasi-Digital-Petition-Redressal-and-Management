@@ -53,6 +53,9 @@
         .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .update-btn { background: #3498db; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .update-btn.secondary { background: #6b7280; }
+        .tabs { display: flex; gap: 10px; margin: 8px 0 12px 0; }
+        .tab-btn { padding: 8px 14px; border-radius: 20px; border: 2px solid #dde; background: #fff; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { background: #3498db; color: #fff; border-color: #3498db; }
         @media (max-width: 768px) { .nav-buttons { flex-direction: column; } }
     </style>
 </head>
@@ -181,6 +184,10 @@
                 <button class="update-btn" type="submit">Login</button>
             </form>
             <div id="dcdm-panel" class="hidden" style="margin-top:16px;">
+                <div class="tabs">
+                    <button id="dcdm-tab-active" class="tab-btn active" onclick="setDcdmTab('active')">Active</button>
+                    <button id="dcdm-tab-closed" class="tab-btn" onclick="setDcdmTab('closed')">Closed</button>
+                </div>
                 <div class="filters" style="margin-bottom:10px;">
                     <select id="dcdm-type-filter" class="filter-select">
                         <option value="">All Types</option>
@@ -229,9 +236,13 @@
                 <h2 style="color:#2c3e50;">🛠️ Official Dashboard</h2>
                 <button class="nav-btn secondary" onclick="logout()">Logout</button>
             </div>
+            <div class="tabs">
+                <button id="official-tab-active" class="tab-btn active" onclick="setOfficialTab('active')">Active</button>
+                <button id="official-tab-closed" class="tab-btn" onclick="setOfficialTab('closed')">Closed</button>
+            </div>
             <div class="filters" style="margin-bottom:12px;">
                 <select id="admin-type-filter" class="filter-select"><option value="">All Types</option><option value="complaint">Complaints</option><option value="petition">Petitions</option></select>
-                <select id="admin-status-filter" class="filter-select"><option value="">All Status</option><option value="in-progress">In Progress</option><option value="validating">Validating</option><option value="accepted">Accepted</option><option value="resolved">Resolved</option><option value="rejected">Rejected</option><option value="pending">Pending</option></select>
+                <select id="admin-status-filter" class="filter-select"><option value="">All Status</option><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="validating">Validating</option><option value="accepted">Accepted</option><option value="resolved">Resolved</option><option value="rejected">Rejected</option></select>
                 <select id="admin-taluk-select" class="filter-select"><option value="">All Taluks</option></select>
                 <select id="admin-firka-select" class="filter-select" disabled><option value="">All Firkas</option></select>
                 <select id="admin-village-select" class="filter-select" disabled><option value="">All Villages</option></select>
@@ -280,6 +291,8 @@
         let currentType = 'complaint';
         let isAdmin = false;
         const SUBMISSIONS_KEY = 'tenkasi_submissions_by_phone_v1';
+        let dcdmTab = 'active';
+        let officialTab = 'active';
 
         // Locations
         const locations = {
@@ -572,11 +585,11 @@
             const vil = document.getElementById('dcdm-village-filter').value; if(vil) params.village=vil;
             const q = document.getElementById('dcdm-search').value.trim(); if(q) params.q=q;
             const items = await listSubmissions(params);
-            const active = items.filter(x => x.status !== 'resolved');
-            const resolved = items.filter(x => x.status === 'resolved');
-            const resolvedBlock = resolved.length ? `<div class=\"card\" style=\"background:#f9fafb\"><h3 style=\"margin-bottom:8px;color:#065f46\">Resolved</h3>${resolved.map(x=>buildCard(x,false)).join('')}</div>` : '';
-            document.getElementById('dcdm-list').innerHTML = active.map(x=>buildCard(x,false)).join('') + resolvedBlock;
+            const viewItems = dcdmTab === 'closed' ? items.filter(x=>x.status==='resolved') : items.filter(x=>x.status!=='resolved');
+            document.getElementById('dcdm-list').innerHTML = viewItems.map(x=>buildCard(x,false)).join('');
         }
+
+        function setDcdmTab(tab){ dcdmTab = tab; document.getElementById('dcdm-tab-active').classList.toggle('active', tab==='active'); document.getElementById('dcdm-tab-closed').classList.toggle('active', tab==='closed'); loadDcdmList(); }
 
         // Admin login
         function setupAdmin(){
@@ -603,12 +616,11 @@
             const vil = document.getElementById('admin-village-select').value; if(vil) params.village=vil;
             const q = document.getElementById('admin-search-box').value.trim(); if(q) params.q=q;
             const items = await listSubmissions(params);
-            // group resolved separately
-            const active = items.filter(x => x.status !== 'resolved');
-            const resolved = items.filter(x => x.status === 'resolved');
-            const resolvedBlock = resolved.length ? `<div class=\"card\" style=\"background:#f9fafb\"><h3 style=\"margin-bottom:8px;color:#065f46\">Resolved</h3>${resolved.map(x=>buildCard(x,true)).join('')}</div>` : '';
-            document.getElementById('admin-complaints-list').innerHTML = active.map(x=>buildCard(x,true)).join('') + resolvedBlock;
+            const viewItems = officialTab === 'closed' ? items.filter(x=>x.status==='resolved') : items.filter(x=>x.status!=='resolved');
+            document.getElementById('admin-complaints-list').innerHTML = viewItems.map(x=>buildCard(x,true)).join('');
         }
+
+        function setOfficialTab(tab){ officialTab = tab; document.getElementById('official-tab-active').classList.toggle('active', tab==='active'); document.getElementById('official-tab-closed').classList.toggle('active', tab==='closed'); displayAdminList(); }
 
         async function updateStatus(id){
             const status = document.getElementById(`st-${id}`).value;
