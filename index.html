@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenkasi District Administration</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 { color: #2c3e50; margin-bottom: 10px; font-size: 2.5em; font-weight: 700; }
+        .header p { color: #7f8c8d; font-size: 1.1em; }
+
+        .nav-buttons { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+
+        .nav-btn {
+            padding: 12px 25px; border: none; border-radius: 25px; cursor: pointer;
+            font-weight: 600; transition: all 0.3s ease; font-size: 14px;
+        }
+        .nav-btn.primary { background: linear-gradient(45deg, #3498db, #2980b9); color: white; }
+        .nav-btn.secondary { background: rgba(255, 255, 255, 0.2); color: #2c3e50; border: 2px solid rgba(255, 255, 255, 0.3); }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .form-inline { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 2px solid #e1e8ed; border-radius: 12px; font-size: 14px; transition: border-color 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .hint { font-size: 12px; color: #7f8c8d; margin-top: 6px; }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 15px 30px; border: none; border-radius: 25px;
+            cursor: pointer; font-weight: 600; font-size: 16px; width: 100%; transition: all 0.3s ease;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
+
+        .hidden { display: none; }
+
+        .complaint-item { border: 2px solid #e1e8ed; border-radius: 15px; padding: 20px; margin-bottom: 15px; transition: all 0.3s ease; }
+        .complaint-item:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        .complaint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .complaint-id { font-weight: 700; font-size: 18px; color: #2c3e50; }
+
+        .status-badge { padding: 6px 15px; border-radius: 20px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+        .status-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .status-in-progress { background: #cce5ff; color: #004085; border: 1px solid #74b9ff; }
+        .status-resolved { background: #d4edda; color: #155724; border: 1px solid #00b894; }
+        .status-rejected { background: #f8d7da; color: #721c24; border: 1px solid #e74c3c; }
+        .status-validating { background: #e8f0fe; color: #1a73e8; border: 1px solid #bcd2ff; }
+        .status-accepted { background: #e6fffa; color: #0d9488; border: 1px solid #99f6e4; }
+
+        .complaint-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; font-size: 14px; color: #7f8c8d; }
+        .complaint-description { background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #3498db; }
+
+        .admin-controls { display: flex; gap: 10px; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e1e8ed; flex-wrap: wrap; }
+        .status-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .update-btn { background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s ease; }
+        .update-btn:hover { background: #2980b9; }
+        .update-btn.secondary { background: #6c757d; }
+
+        .login-form { max-width: 400px; margin: 0 auto; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        .stat-number { font-size: 2.5em; font-weight: 700; margin-bottom: 5px; }
+        .stat-label { color: #7f8c8d; font-size: 14px; text-transform: uppercase; font-weight: 600; }
+
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+
+        .ack {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+        }
+        .ack strong { color: #2c7a7b; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 16px; }
+        .tab-btn { padding: 8px 14px; border-radius: 20px; border: 2px solid #dde; background: #fff; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { background: #3498db; color: #fff; border-color: #3498db; }
+
+        .highlight { outline: 2px solid #3498db; }
+
+        @media (max-width: 768px) {
+            .nav-buttons { flex-direction: column; align-items: center; }
+            .complaint-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .admin-controls { flex-direction: column; align-items: stretch; }
+            .filters { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Tenkasi District Administration</h1>
+            <p>Digital Petition Redressal Mechanism</p>
+            <div class="nav-buttons">
+                <button class="nav-btn primary" onclick="showSection('public')">📝 File Petition/Complaint</button>
+                <button class="nav-btn secondary" onclick="showSection('view')">👁️ View Submissions</button>
+                <button class="nav-btn secondary" onclick="showSection('admin-login')">🔐 Official Login</button>
+            </div>
+        </div>
+
+        <!-- Public Form -->
+        <div id="public-section" class="card">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">📝 New Petition/Complaint</h2>
+            <form id="complaint-form">
+                <div class="form-group">
+                    <label>Submission Type</label>
+                    <div class="form-inline">
+                        <label style="display:flex; align-items:center; gap:8px;">
+                            <input type="radio" name="submission-type" value="complaint" id="type-complaint" checked> Civic Complaint
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px;">
+                            <input type="radio" name="submission-type" value="petition" id="type-petition"> Petition
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="complainant-name">Your Name</label>
+                    <input type="text" id="complainant-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="complainant-phone">Phone Number</label>
+                    <input type="tel" id="complainant-phone" required placeholder="Enter your mobile number">
+                    <div class="hint">This number identifies your submission. Only one submission (petition or complaint) is allowed per phone in a 7-day period.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="complainant-email">Email Address</label>
+                    <input type="email" id="complainant-email" placeholder="Optional">
+                </div>
+
+                <div class="form-group" id="category-group">
+                    <label for="complaint-category">Category (for Civic Complaint)</label>
+                    <select id="complaint-category">
+                        <option value="">Select Category</option>
+                        <option value="road-maintenance">🛣️ Road Maintenance</option>
+                        <option value="water-supply">💧 Water Supply</option>
+                        <option value="garbage-collection">🗑️ Garbage Collection</option>
+                        <option value="street-lighting">💡 Street Lighting</option>
+                        <option value="drainage">🌊 Drainage Issues</option>
+                        <option value="public-transport">🚌 Public Transport</option>
+                        <option value="noise-pollution">🔊 Noise Pollution</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="department-group">
+                    <label for="petition-department">Department (for Petition)</label>
+                    <select id="petition-department">
+                        <option value="">Select Department</option>
+                        <option value="revenue">🏢 Revenue Department</option>
+                        <option value="rural-development">🏡 Rural Development & Panchayat Raj</option>
+                        <option value="municipal-administration">🏙️ Municipal Administration</option>
+                        <option value="public-works">🏗️ Public Works (PWD)</option>
+                        <option value="highways">🛣️ Highways</option>
+                        <option value="health">🏥 Health & Family Welfare</option>
+                        <option value="school-education">🎒 School Education</option>
+                        <option value="higher-education">🎓 Higher Education</option>
+                        <option value="social-welfare">🤝 Social Welfare</option>
+                        <option value="agriculture">🌾 Agriculture</option>
+                        <option value="horticulture">🌱 Horticulture</option>
+                        <option value="animal-husbandry">🐄 Animal Husbandry</option>
+                        <option value="forest">🌳 Forest</option>
+                        <option value="police">👮 Police</option>
+                        <option value="fire-rescue">🚒 Fire & Rescue</option>
+                        <option value="electricity">⚡ TANGEDCO (Electricity)</option>
+                        <option value="transport">🚌 Transport</option>
+                        <option value="registration">📝 Registration</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <div class="form-inline">
+                        <select id="taluk-select" required>
+                            <option value="">Select Taluk</option>
+                        </select>
+                        <select id="firka-select" required disabled>
+                            <option value="">Select Firka</option>
+                        </select>
+                        <select id="village-select" required disabled>
+                            <option value="">Select Village</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="complaint-description">Detailed Description</label>
+                    <textarea id="complaint-description" placeholder="Please provide detailed information about the issue..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="urgency-level">Urgency Level</label>
+                    <select id="urgency-level" required>
+                        <option value="low">🟢 Low</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+
+        <!-- View Submissions Section -->
+        <div id="view-section" class="card hidden">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">👁️ Public Submissions Dashboard</h2>
+
+            <div id="ack-banner" class="ack hidden">
+                <div>
+                    <span>Submitted successfully. Your reference ID is</span>
+                    <strong id="ack-id"></strong>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap: wrap;">
+                    <button class="update-btn" onclick="copyAckId()">Copy ID</button>
+                    <button class="update-btn" onclick="downloadAcknowledgementByAck()">Download Acknowledgement</button>
+                    <button class="update-btn secondary" onclick="hideAck()">Dismiss</button>
+                </div>
+            </div>
+            
+            <div class="filters" style="margin-top: 4px;">
+                <input type="text" id="track-id-input" class="filter-select" placeholder="Enter Submission ID (e.g., CMP004)">
+                <button class="update-btn" onclick="trackById()">View by ID</button>
+                <button class="update-btn secondary" onclick="downloadById()">Download by ID</button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #f39c12;" id="pending-count">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #3498db;" id="progress-count">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #2ecc71;" id="resolved-count">0</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #e74c3c;" id="rejected-count">0</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+
+            <div class="filters">
+                <select id="category-filter" class="filter-select">
+                    <option value="">All Complaint Categories</option>
+                    <option value="road-maintenance">🛣️ Road Maintenance</option>
+                    <option value="water-supply">💧 Water Supply</option>
+                    <option value="garbage-collection">🗑️ Garbage Collection</option>
+                    <option value="street-lighting">💡 Street Lighting</option>
+                    <option value="drainage">🌊 Drainage Issues</option>
+                    <option value="public-transport">🚌 Public Transport</option>
+                    <option value="noise-pollution">🔊 Noise Pollution</option>
+                    <option value="other">📋 Other</option>
+                </select>
+                
+                <select id="status-filter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="validating">Validating</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                
+                <input type="text" id="search-box" class="filter-select" placeholder="Search by ID, description, or location...">
+            </div>
+            
+            <div id="complaints-list"></div>
+        </div>
+
+        <!-- Admin Login -->
+        <div id="admin-login-section" class="card hidden">
+            <div class="login-form">
+                <h2 style="margin-bottom: 20px; color: #2c3e50; text-align: center;">🔐 Official Login</h2>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label for="admin-username">Username</label>
+                        <input type="text" id="admin-username" value="admin" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin-password">Password</label>
+                        <input type="password" id="admin-password" value="admin123" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+                <p style="text-align: center; margin-top: 15px; color: #7f8c8d; font-size: 14px;">Demo credentials: admin / admin123</p>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-section" class="card hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #2c3e50;">🛠️ Admin Dashboard</h2>
+                <button class="nav-btn secondary" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="form-group">
+                <label>Jurisdiction</label>
+                <div class="form-inline">
+                    <select id="admin-taluk-select">
+                        <option value="">All Taluks</option>
+                    </select>
+                    <select id="admin-firka-select" disabled>
+                        <option value="">All Firkas</option>
+                    </select>
+                    <select id="admin-village-select" disabled>
+                        <option value="">All Villages</option>
+                    </select>
+                </div>
+                <div class="hint">Lists below are filtered to your selected jurisdiction.</div>
+            </div>
+
+            <div class="tabs">
+                <button id="tab-complaints" class="tab-btn active" onclick="setAdminTab('complaints')">Complaints</button>
+                <button id="tab-petitions" class="tab-btn" onclick="setAdminTab('petitions')">Petitions</button>
+            </div>
+
+            <div id="admin-complaints-panel">
+                <div class="filters">
+                    <select id="admin-category-filter" class="filter-select">
+                        <option value="">All Complaint Categories</option>
+                        <option value="road-maintenance">🛣️ Road Maintenance</option>
+                        <option value="water-supply">💧 Water Supply</option>
+                        <option value="garbage-collection">🗑️ Garbage Collection</option>
+                        <option value="street-lighting">💡 Street Lighting</option>
+                        <option value="drainage">🌊 Drainage Issues</option>
+                        <option value="public-transport">🚌 Public Transport</option>
+                        <option value="noise-pollution">🔊 Noise Pollution</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+                    
+                    <select id="admin-complaint-status-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                    
+                    <input type="text" id="admin-complaint-search-box" class="filter-select" placeholder="Search complaints...">
+                </div>
+                <div id="admin-complaints-list"></div>
+            </div>
+
+            <div id="admin-petitions-panel" class="hidden">
+                <div class="filters">
+                    <select id="admin-department-filter" class="filter-select">
+                        <option value="">All Departments</option>
+                        <option value="revenue">🏢 Revenue Department</option>
+                        <option value="rural-development">🏡 Rural Development & Panchayat Raj</option>
+                        <option value="municipal-administration">🏙️ Municipal Administration</option>
+                        <option value="public-works">🏗️ Public Works (PWD)</option>
+                        <option value="highways">🛣️ Highways</option>
+                        <option value="health">🏥 Health & Family Welfare</option>
+                        <option value="school-education">🎒 School Education</option>
+                        <option value="higher-education">🎓 Higher Education</option>
+                        <option value="social-welfare">🤝 Social Welfare</option>
+                        <option value="agriculture">🌾 Agriculture</option>
+                        <option value="horticulture">🌱 Horticulture</option>
+                        <option value="animal-husbandry">🐄 Animal Husbandry</option>
+                        <option value="forest">🌳 Forest</option>
+                        <option value="police">👮 Police</option>
+                        <option value="fire-rescue">🚒 Fire & Rescue</option>
+                        <option value="electricity">⚡ TANGEDCO (Electricity)</option>
+                        <option value="transport">🚌 Transport</option>
+                        <option value="registration">📝 Registration</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+
+                    <select id="admin-petition-status-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="validating">Validating</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="pending">Pending</option>
+                    </select>
+
+                    <input type="text" id="admin-petition-search-box" class="filter-select" placeholder="Search petitions...">
+                </div>
+                <div id="admin-petitions-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let complaints = [];
+        let isAdmin = false;
+        let complaintCounter = 1;
+        let lastSubmittedId = '';
+        let adminTab = 'complaints';
+
+        // Locations data (Taluk -> Firka -> Villages)
+        const locations = {
+          "Tenkasi": {
+            "Kallurani": [
+              "Sundarapandiapuram","Thiruchitrambalam","Melapavoor","Pattakuruchi","Gunaramanallur",
+              "Kulasekarapatti","Kallurani","Thippanampatti","Avudaiyannur"
+            ],
+            "Tenkasi": [
+              "Pulliyur","Tenkasi","Kuthukkalvalasai","Ilanji","Courtrallam","Melagaram",
+              "Pattapathu","Minnadicheri","Ayiraperi","Mathalamparai","Sillaraipuravu"
+            ],
+            "Kadayam": [
+              "Mela Kadaiyam","Therkku Madathur","Ayan Pottalpudhur","Therkku Kadaiyam","Veerasamudram",
+              "Ravanasamudram","Govindaperi","Ayan Dharmapuramadam","Kadaiyam Perumpathu Part-1",
+              "Kadaiyam Perumpathu Part-2","Keela Kadaiyam Part-1","Keela Kadaiyam Part-2"
+            ],
+            "Alwarkurichi": [
+              "Sivasailam","Keela Ambur","Vadakku Pappankulam","Adaichani","Alwarkurichi Part-1",
+              "Alwarkurichi Part-2","Mela Ambur Part-1","Mela Ambur Part-2"
+            ]
+          },
+          "Kadayanallur": {
+            "Puliyangudi": [
+              "Nagaram","Malayadikkurichi","Chinthamani","Puliyangudi","Melapuliyankudi",
+              "Thirumalainayakan Pudukudi","Thalaivankottai","Ramasamiyapuram","Alangulam"
+            ],
+            "Kadayanallur": [
+              "Vairavankulam","Krishnapuram","Chokkampatti","Boganallur","Kanagasabapathiperi",
+              "Kadayanallur","Kasitharmam","Punnaivanam","Madathupatti","Ariyanayagipuram",
+              "Sendamangalam","Achanpudur","Kampaneri Pudukudi Part-1","Kampaneri Pudukudi Part-2"
+            ],
+            "Ayikudi": [
+              "Idaikal","Nainaragaram","Kilangadu","Kodikkurichi","Ayikudi","Urmelaalagiyaan","Poigai","Sambavar Vadakarai"
+            ]
+          },
+          "Thiruvengadam": {
+            "Karisalkulam": ["Malaiyan Kulam","Perungkottur","Chandirangondan","Azagapuri","Chavelkulam","Mathurapuri","A.Mathurapuri","A.Kariselkulam","Karisathan","Kulasekarapperi","Rengasamudram","Subbaiah Puram","Chathirapatti","Kalingapatti Part-1","Kalingapatti Part-2"],
+            "Thiruvengadam": ["Thiruvengadam","Vellakulam","Kurinchakulam","Sangupatti","Maipparai","Varaganoor","Naduvappatti","Kulakkattakurichi","Sundaresapuram","Vadakku Kuruvikulam","Ramalinga Puram","Athippatti","Vagaikulam"],
+            "Pazhankottai": ["K.Alangulam","Therku Kuruvikulam","Naluvasan Kottai","Pazhankottai","Usilangulam","Chettikulam","Mahendravadi","Maruthan Ginaru","Kalappalangulam","Nalanthula","K.Karisalkulam","Sayamalai Part-1","Sayamalai Part-2"]
+          },
+          "Sankarankoil": {
+            "Karivalamvanthanallur": ["Perumalpatti","Valavanthapuram","Panthapuli","Paruvakudi","Karivalamvantha Nallur","Vayali","Kuvalaikanni","Panaiyoor","Periyoor"],
+            "Sernthamangalam": ["Kulasekaramangalum","Vellalankulam","Yechantha","Pattadaikatti","Naduvakurichi-Major"],
+            "Sankarankoil": ["Perumpathur","Manaloor","Vadikkottai","Kalappakulam","Sankarankovil"],
+            "Veerasigamani": ["Vaddakuputhur","Veeriruppu","Nochikulam","Therku Sankarankovil","Poigai","Veerasigamani","Keelaveerasigamani"],
+            "Gurukkalpatti": ["Naduvakurichi-Minor","Chinnakovilan Kulam","Periyakovilan Kulam","K.Maruthappapuram","Gurukkalpatti","Vadakku Panai Vadali","Keelaneelithanallur","Melaneelithanallur","Ilanthaikulam"]
+          },
+          "Shencottai": {
+            "Shencottai": ["Nagalkadu","Pudur","Puliyarai","Karkudi","Sengottai Town","Sengottai Keelur","Sengottai Melur"],
+            "Panpozhi": ["Mekkarai","Vadakarai Melpidagai","Vadakarai Keelpidagai","Panpoli","Thenpothai","Kanakkapillaivalasai","Periyapillaivalasai"],
+            "Ilanthur": ["Neduvayal","Elathur","Kunnakudy","Piranoor","Vallam"]
+          },
+          "Veerakeralampudur": {
+            "Veerakeralampudur": ["Vellakal","Veerakeralampudur","Rajagopalaperi","Agaram","Veeranam"],
+            "Surandai": ["Kulayaneri","Sivagurunathapuram","Anaikulam","Zamin Surandai","Surandai Part-I","Surandai Part-II"],
+            "Karuvantha": ["Melakalangal","Keelakalangal","Navaneethakrishnapuram","Kurichanpatti","Karuvantha","Vadi","Achankuttam"],
+            "Uthumalai": ["Vadakkukavalakurichi","Uthumalai","Melamarudappapuram","Balapathiraramapuram","Marukkalankulam","Muthammalpuram"]
+          },
+          "Alangulam": {
+            "Keelapavoor": ["Kaluneerkulam","Thuthikulam","Poolankulam","Keelapavoor Part-1","Keelapavoor Part-2","Pethanadarpatti Part-1","Pethanadarpatti Part-2"],
+            "Nettur": ["Kidarakulam","Kasikkuvaithan","Kavalakuruchi","Kadanganeri","Kaduvetti","Subbiahpuram","Nettur","Naranapuram"],
+            "Vengadampatti": ["Madathur","Anainthaperumalnadanur","Thuppakudi","Ravuthaperi","Anjankattalai","Venkadampatti Part-1","Venkadampatti Part-2"],
+            "Puthupatti": ["Kuthapanjan","Odaimarichchan","Udaiyampuli","Pudupatti Part-1","Pudupatti Part-2","Maruthamputhur Part-1","Maruthamputhur Part-2"],
+            "Alangulam": ["Mayamankuruchi","Ayyanarkulam","Sivalarkulam","Alangulam","Andipatti","Maranthai"]
+          },
+          "Sivagiri": {
+            "Sivagiri": ["Ramanathapuram","Sivagiri - Part-1","Sivagiri - Part-2","Rayagiri - Part-1","Rayagiri - Part-2","Viswanathaperi - Part-1","Viswanathaperi - Part-2"],
+            "Cuddalore": ["Inamkovilpatti","Cuddalor","Nelkkattumseval","Patakurichi","Ariyur","Thenmalai - Part-1","Thenmalai - Part-2"],
+            "Vasudevanallur": ["Thirumalapuram","Vasudevanallur","Subramaniyapuram","Dharugapuram","Sanganaperi","Naranapuram - Part-1","Naranapuram - Part-2"]
+          }
+        };
+
+        // Initialize with sample data
+        function initializeSampleData() {
+            const sampleComplaints = [
+                {
+                    id: 'CMP001', type: 'complaint', name: 'John Smith', email: 'john@email.com', phone: '+1234567890',
+                    category: 'road-maintenance', taluk: 'Tenkasi', firka: 'Tenkasi', village: 'Melagaram',
+                    description: 'Large pothole causing traffic issues and potential vehicle damage.', urgency: 'high',
+                    status: 'pending', timestamp: new Date('2025-08-08'), lastUpdated: new Date('2025-08-08')
+                },
+                {
+                    id: 'CMP002', type: 'complaint', name: 'Sarah Johnson', email: 'sarah@email.com', phone: '+1234567891',
+                    category: 'water-supply', taluk: 'Kadayanallur', firka: 'Puliyangudi', village: 'Puliyangudi',
+                    description: 'No water supply for the past 3 days. Affecting entire building.', urgency: 'high',
+                    status: 'in-progress', timestamp: new Date('2025-08-07'), lastUpdated: new Date('2025-08-09')
+                },
+                {
+                    id: 'CMP003', type: 'petition', name: 'Mike Wilson', email: 'mike@email.com', phone: '+1234567892',
+                    department: 'revenue', taluk: 'Sankarankoil', firka: 'Sankarankoil', village: 'Sankarankovil',
+                    description: 'Request for patta name correction for ancestral land records.', urgency: 'medium',
+                    status: 'resolved', timestamp: new Date('2025-08-05'), lastUpdated: new Date('2025-08-09')
+                }
+            ];
+            complaints = sampleComplaints;
+            complaintCounter = 4;
+        }
+
+        // Navigation
+        function showSection(section) {
+            const sections = ['public', 'view', 'admin-login', 'admin'];
+            sections.forEach(s => document.getElementById(`${s}-section`).classList.add('hidden'));
+            if (section === 'admin' && !isAdmin) section = 'admin-login';
+            document.getElementById(`${section}-section`).classList.remove('hidden');
+
+            if (section === 'view') {
+                displayComplaints('complaints-list');
+                updateStats();
+                if (lastSubmittedId) showAckBanner(lastSubmittedId);
+            } else if (section === 'admin') {
+                displayAdminLists();
+                updateAdminStats();
+            }
+        }
+
+        // Type toggle: show/hide category vs department
+        function setupTypeToggle() {
+            const typeComplaint = document.getElementById('type-complaint');
+            const typePetition = document.getElementById('type-petition');
+            const categoryGroup = document.getElementById('category-group');
+            const departmentGroup = document.getElementById('department-group');
+
+            function updateVisibility() {
+                if (typePetition.checked) {
+                    categoryGroup.classList.add('hidden');
+                    departmentGroup.classList.remove('hidden');
+                    document.getElementById('petition-department').setAttribute('required', 'required');
+                    document.getElementById('complaint-category').removeAttribute('required');
+                } else {
+                    departmentGroup.classList.add('hidden');
+                    categoryGroup.classList.remove('hidden');
+                    document.getElementById('complaint-category').setAttribute('required', 'required');
+                    document.getElementById('petition-department').removeAttribute('required');
+                }
+            }
+            typeComplaint.addEventListener('change', updateVisibility);
+            typePetition.addEventListener('change', updateVisibility);
+            updateVisibility();
+        }
+
+        // Cascading dropdowns for Taluk -> Firka -> Village (public)
+        function setupLocationDropdowns() {
+            const talukSelect = document.getElementById('taluk-select');
+            const firkaSelect = document.getElementById('firka-select');
+            const villageSelect = document.getElementById('village-select');
+
+            function resetSelect(select, placeholderText) {
+                select.innerHTML = '';
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = placeholderText;
+                select.appendChild(opt);
+            }
+
+            function populateTaluks() {
+                resetSelect(talukSelect, 'Select Taluk');
+                Object.keys(locations).forEach(taluk => {
+                    const opt = document.createElement('option'); opt.value = taluk; opt.textContent = taluk; talukSelect.appendChild(opt);
+                });
+                firkaSelect.disabled = true; villageSelect.disabled = true;
+                resetSelect(firkaSelect, 'Select Firka'); resetSelect(villageSelect, 'Select Village');
+            }
+
+            talukSelect.addEventListener('change', () => {
+                const taluk = talukSelect.value;
+                resetSelect(firkaSelect, 'Select Firka'); resetSelect(villageSelect, 'Select Village');
+                villageSelect.disabled = true;
+                if (!taluk) { firkaSelect.disabled = true; return; }
+                Object.keys(locations[taluk] || {}).forEach(firka => {
+                    const opt = document.createElement('option'); opt.value = firka; opt.textContent = firka; firkaSelect.appendChild(opt);
+                });
+                firkaSelect.disabled = false;
+            });
+
+            firkaSelect.addEventListener('change', () => {
+                const taluk = talukSelect.value; const firka = firkaSelect.value;
+                resetSelect(villageSelect, 'Select Village');
+                if (!taluk || !firka) { villageSelect.disabled = true; return; }
+                (locations[taluk]?.[firka] || []).forEach(v => {
+                    const opt = document.createElement('option'); opt.value = v; opt.textContent = v; villageSelect.appendChild(opt);
+                });
+                villageSelect.disabled = false;
+            });
+
+            populateTaluks();
+        }
+
+        // Admin Jurisdiction dropdowns
+        function setupAdminLocationDropdowns() {
+            const talukSelect = document.getElementById('admin-taluk-select');
+            const firkaSelect = document.getElementById('admin-firka-select');
+            const villageSelect = document.getElementById('admin-village-select');
+
+            function resetSelect(select, placeholderText) {
+                select.innerHTML = '';
+                const opt = document.createElement('option'); opt.value = ''; opt.textContent = placeholderText; select.appendChild(opt);
+            }
+
+            function populateTaluks() {
+                resetSelect(talukSelect, 'All Taluks');
+                Object.keys(locations).forEach(taluk => {
+                    const opt = document.createElement('option'); opt.value = taluk; opt.textContent = taluk; talukSelect.appendChild(opt);
+                });
+                firkaSelect.disabled = true; villageSelect.disabled = true;
+                resetSelect(firkaSelect, 'All Firkas'); resetSelect(villageSelect, 'All Villages');
+            }
+
+            talukSelect.addEventListener('change', () => {
+                const taluk = talukSelect.value;
+                resetSelect(firkaSelect, 'All Firkas'); resetSelect(villageSelect, 'All Villages');
+                villageSelect.disabled = true;
+                if (!taluk) { firkaSelect.disabled = true; displayAdminLists(); return; }
+                Object.keys(locations[taluk] || {}).forEach(firka => {
+                    const opt = document.createElement('option'); opt.value = firka; opt.textContent = firka; firkaSelect.appendChild(opt);
+                });
+                firkaSelect.disabled = false;
+                displayAdminLists();
+            });
+
+            firkaSelect.addEventListener('change', () => {
+                const taluk = talukSelect.value; const firka = firkaSelect.value;
+                resetSelect(villageSelect, 'All Villages');
+                if (!taluk || !firka) { villageSelect.disabled = true; displayAdminLists(); return; }
+                (locations[taluk]?.[firka] || []).forEach(v => {
+                    const opt = document.createElement('option'); opt.value = v; opt.textContent = v; villageSelect.appendChild(opt);
+                });
+                villageSelect.disabled = false;
+                displayAdminLists();
+            });
+
+            villageSelect.addEventListener('change', displayAdminLists);
+            populateTaluks();
+        }
+
+        // Phone submission limiter (1 per 7 days)
+        const SUBMISSIONS_KEY = 'tenkasi_submissions_by_phone_v1';
+        function getSubmissionsMap() { try { return JSON.parse(localStorage.getItem(SUBMISSIONS_KEY)) || {}; } catch { return {}; } }
+        function setSubmissionsMap(map) { localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(map)); }
+        function normalizePhone(raw) { const digits = String(raw || '').replace(/\D/g, ''); return digits.length >= 10 ? digits.slice(-10) : digits; }
+        function isEligibleToSubmit(phone) {
+            const ts = getSubmissionsMap()[phone]; if (!ts) return true; const ONE_WEEK_MS = 7*24*60*60*1000; return (Date.now()-ts) >= ONE_WEEK_MS;
+        }
+        function recordSubmission(phone) { const map = getSubmissionsMap(); map[phone] = Date.now(); setSubmissionsMap(map); }
+
+        // Form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('complaint-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const selectedType = document.querySelector('input[name="submission-type"]:checked')?.value || 'complaint';
+                const name = document.getElementById('complainant-name').value.trim();
+                const email = document.getElementById('complainant-email').value.trim();
+                const phoneRaw = document.getElementById('complainant-phone').value.trim();
+                const phone = normalizePhone(phoneRaw);
+                if (!phone) { alert('Phone number is required.'); return; }
+                if (!isEligibleToSubmit(phone)) {
+                    const last = getSubmissionsMap()[phone];
+                    const nextEligible = new Date(last + 7 * 24 * 60 * 60 * 1000);
+                    alert(`This phone number has already submitted within the last 7 days. You can submit again on: ${nextEligible.toLocaleString()}`);
+                    return;
+                }
+
+                const taluk = document.getElementById('taluk-select').value;
+                const firka = document.getElementById('firka-select').value;
+                const village = document.getElementById('village-select').value;
+                if (!taluk || !firka || !village) { alert('Please select Taluk, Firka, and Village.'); return; }
+
+                const description = document.getElementById('complaint-description').value.trim();
+                const urgency = document.getElementById('urgency-level').value;
+                const id = `CMP${String(complaintCounter).padStart(3, '0')}`;
+
+                const item = {
+                    id, type: selectedType, name, email, phone: phoneRaw, taluk, firka, village,
+                    description, urgency, status: 'pending', timestamp: new Date(), lastUpdated: new Date()
+                };
+                if (selectedType === 'petition') {
+                    const department = document.getElementById('petition-department').value;
+                    if (!department) { alert('Please select a Department for Petition.'); return; }
+                    item.department = department;
+                } else {
+                    const category = document.getElementById('complaint-category').value;
+                    if (!category) { alert('Please select a Category for Complaint.'); return; }
+                    item.category = category;
+                }
+
+                complaints.push(item);
+                complaintCounter++;
+                recordSubmission(phone);
+                lastSubmittedId = id;
+
+                this.reset();
+                document.getElementById('type-complaint').checked = true;
+                setupTypeToggle();
+                setupLocationDropdowns();
+
+                showSection('view');
+                setTimeout(() => showAckBanner(id), 50);
+            });
+        });
+
+        // Admin login
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('admin-username').value;
+                const password = document.getElementById('admin-password').value;
+                if (username === 'admin' && password === 'admin123') { isAdmin = true; showSection('admin'); }
+                else { alert('Invalid credentials!'); }
+            });
+        });
+
+        function logout() { isAdmin = false; showSection('public'); }
+
+        // Acknowledgement helpers
+        function showAckBanner(id) {
+            const banner = document.getElementById('ack-banner');
+            document.getElementById('ack-id').textContent = id;
+            banner.classList.remove('hidden');
+        }
+        function hideAck() { document.getElementById('ack-banner').classList.add('hidden'); lastSubmittedId = ''; }
+        function copyAckId() { const id = document.getElementById('ack-id').textContent; navigator.clipboard?.writeText(id); }
+        function downloadAcknowledgementByAck() { const id = document.getElementById('ack-id').textContent; downloadAcknowledgement(id); }
+
+        function getSubmissionById(id) { return complaints.find(c => c.id.toLowerCase() === String(id).trim().toLowerCase()); }
+
+        function buildAcknowledgementHTML(item) {
+            const typeLabel = item.type === 'petition' ? 'Petition' : 'Civic Complaint';
+            const label = item.type === 'petition' ? getDepartmentLabel(item.department) : getCategoryLabel(item.category);
+            const labelName = item.type === 'petition' ? 'Department' : 'Category';
+            const submitted = new Date(item.timestamp).toLocaleString();
+            const location = `${item.taluk} / ${item.firka} / ${item.village}`;
+            return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Acknowledgement ${item.id}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 24px; }
+                    .wrap { max-width: 720px; margin: 0 auto; }
+                    h1 { margin-bottom: 4px; }
+                    .sub { color:#555; margin-bottom: 18px; }
+                    .box { border:1px solid #ddd; border-radius: 8px; padding: 16px; }
+                    .row { display:flex; gap:12px; margin: 6px 0; }
+                    .k { width: 160px; color:#555; }
+                    .v { font-weight: 600; }
+                    .footer { margin-top: 16px; color:#777; font-size: 12px; }
+                    @media print { .noprint { display:none; } }
+                </style>
+            </head><body><div class="wrap">
+                <h1>Tenkasi District Administration</h1>
+                <div class="sub">Digital Petition Redressal Mechanism</div>
+                <div class="box">
+                    <div class="row"><div class="k">Reference ID</div><div class="v">${item.id}</div></div>
+                    <div class="row"><div class="k">Type</div><div class="v">${typeLabel}</div></div>
+                    <div class="row"><div class="k">${labelName}</div><div class="v">${label}</div></div>
+                    <div class="row"><div class="k">Name</div><div class="v">${item.name}</div></div>
+                    <div class="row"><div class="k">Phone</div><div class="v">${item.phone}</div></div>
+                    ${item.email ? `<div class="row"><div class="k">Email</div><div class="v">${item.email}</div></div>` : ''}
+                    <div class="row"><div class="k">Location</div><div class="v">${location}</div></div>
+                    <div class="row"><div class="k">Urgency</div><div class="v">${getUrgencyLabel(item.urgency)}</div></div>
+                    <div class="row"><div class="k">Submitted</div><div class="v">${submitted}</div></div>
+                    <div class="row"><div class="k">Status</div><div class="v">${item.status.replace('-', ' ')}</div></div>
+                    <div style="margin-top:10px"><div class="k" style="color:#555">Description</div><div>${item.description}</div></div>
+                </div>
+                <div class="footer">You may save this page as PDF for your records. <span class="noprint">Use the browser Print dialog.</span></div>
+                <div class="noprint" style="margin-top:10px;"><button onclick="window.print()">Print / Save as PDF</button></div>
+            </div></body></html>`;
+        }
+        function downloadAcknowledgement(id) {
+            const item = getSubmissionById(id);
+            if (!item) { alert('No submission found for ID: ' + id); return; }
+            const w = window.open('', '_blank');
+            if (!w) { alert('Popup blocked. Please allow popups for this site.'); return; }
+            w.document.open();
+            w.document.write(buildAcknowledgementHTML(item));
+            w.document.close();
+        }
+
+        function trackById() {
+            const id = document.getElementById('track-id-input').value.trim();
+            if (!id) return;
+            const item = getSubmissionById(id);
+            if (!item) { alert('No submission found for ID: ' + id); return; }
+            // show list and highlight
+            displayComplaints('complaints-list');
+            const el = document.getElementById('item-' + item.id);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 2500); }
+        }
+        function downloadById() {
+            const id = document.getElementById('track-id-input').value.trim();
+            if (!id) return; downloadAcknowledgement(id);
+        }
+
+        // Display complaints/petitions
+        function displayComplaints(containerId, showAdminControls = false, options = {}) {
+            const container = document.getElementById(containerId);
+            let filtered = [...complaints];
+
+            // Apply type filter by container or options
+            if (options.typeFilter) {
+                filtered = filtered.filter(c => c.type === options.typeFilter);
+            } else if (containerId === 'admin-complaints-list') {
+                filtered = filtered.filter(c => c.type === 'complaint');
+            } else if (containerId === 'admin-petitions-list') {
+                filtered = filtered.filter(c => c.type === 'petition');
+            }
+
+            // Apply filters
+            if (!showAdminControls) {
+                const categoryFilter = document.getElementById('category-filter');
+                const statusFilter = document.getElementById('status-filter');
+                const searchBox = document.getElementById('search-box');
+                if (categoryFilter?.value) filtered = filtered.filter(c => c.type === 'complaint' && c.category === categoryFilter.value);
+                if (statusFilter?.value) filtered = filtered.filter(c => c.status === statusFilter.value);
+                if (searchBox?.value) {
+                    const s = searchBox.value.toLowerCase();
+                    filtered = filtered.filter(c =>
+                        c.id.toLowerCase().includes(s) ||
+                        (c.description || '').toLowerCase().includes(s) ||
+                        [c.taluk, c.firka, c.village].filter(Boolean).join(' ').toLowerCase().includes(s)
+                    );
+                }
+            } else {
+                // Admin filters including jurisdiction
+                const at = document.getElementById('admin-taluk-select')?.value || '';
+                const af = document.getElementById('admin-firka-select')?.value || '';
+                const av = document.getElementById('admin-village-select')?.value || '';
+                if (at) filtered = filtered.filter(c => c.taluk === at);
+                if (af) filtered = filtered.filter(c => c.firka === af);
+                if (av) filtered = filtered.filter(c => c.village === av);
+
+                if (containerId === 'admin-complaints-list') {
+                    const categoryFilter = document.getElementById('admin-category-filter');
+                    const statusFilter = document.getElementById('admin-complaint-status-filter');
+                    const searchBox = document.getElementById('admin-complaint-search-box');
+                    if (categoryFilter?.value) filtered = filtered.filter(c => c.category === categoryFilter.value);
+                    if (statusFilter?.value) filtered = filtered.filter(c => c.status === statusFilter.value);
+                    if (searchBox?.value) {
+                        const s = searchBox.value.toLowerCase();
+                        filtered = filtered.filter(c => c.id.toLowerCase().includes(s) || (c.description||'').toLowerCase().includes(s));
+                    }
+                }
+                if (containerId === 'admin-petitions-list') {
+                    const deptFilter = document.getElementById('admin-department-filter');
+                    const statusFilter = document.getElementById('admin-petition-status-filter');
+                    const searchBox = document.getElementById('admin-petition-search-box');
+                    if (deptFilter?.value) filtered = filtered.filter(c => c.department === deptFilter.value);
+                    if (statusFilter?.value) filtered = filtered.filter(c => c.status === statusFilter.value);
+                    if (searchBox?.value) {
+                        const s = searchBox.value.toLowerCase();
+                        filtered = filtered.filter(c => c.id.toLowerCase().includes(s) || (c.description||'').toLowerCase().includes(s));
+                    }
+                }
+            }
+
+            // Sort by timestamp (newest first)
+            filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            container.innerHTML = filtered.map(item => {
+                const typeLabel = item.type === 'petition' ? 'Petition' : 'Civic Complaint';
+                const categoryOrDept = item.type === 'petition' ? getDepartmentLabel(item.department) : getCategoryLabel(item.category);
+                const locationLabel = `${item.taluk} / ${item.firka} / ${item.village}`;
+                const statusOptions = getStatusOptions(item.type).map(st => `<option value="${st.value}" ${item.status === st.value ? 'selected' : ''}>${st.label}</option>`).join('');
+                const adminControls = showAdminControls ? `
+                    <div class="admin-controls">
+                        <select class="status-select" id="status-${item.id}">${statusOptions}</select>
+                        <button class="update-btn" onclick="updateComplaintStatus('${item.id}')">Update Status</button>
+                        <button class="update-btn secondary" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button>
+                    </div>` :
+                    `<div class="admin-controls">
+                        <button class="update-btn" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button>
+                    </div>`;
+                return `
+                <div id="item-${item.id}" class="complaint-item">
+                    <div class="complaint-header">
+                        <span class="complaint-id">${item.id}</span>
+                        <span class="status-badge status-${item.status}">${item.status.replace('-', ' ')}</span>
+                    </div>
+                    <div class="complaint-meta">
+                        <div><strong>Type:</strong> ${typeLabel}</div>
+                        <div><strong>${item.type === 'petition' ? 'Department' : 'Category'}:</strong> ${categoryOrDept}</div>
+                        <div><strong>Location:</strong> ${locationLabel}</div>
+                        <div><strong>Urgency:</strong> ${getUrgencyLabel(item.urgency)}</div>
+                        <div><strong>Submitted:</strong> ${new Date(item.timestamp).toLocaleDateString()}</div>
+                        ${showAdminControls ? `<div><strong>Contact:</strong> ${item.name} (${item.phone}${item.email ? ' / ' + item.email : ''})</div>` : ''}
+                    </div>
+                    <div class="complaint-description">
+                        <strong>Description:</strong><br>${item.description}
+                    </div>
+                    ${adminControls}
+                </div>`;
+            }).join('');
+        }
+
+        function getStatusOptions(type) {
+            if (type === 'petition') {
+                return [
+                    { value: 'in-progress', label: 'In Progress' },
+                    { value: 'validating', label: 'Validating' },
+                    { value: 'accepted', label: 'Accepted' },
+                    { value: 'resolved', label: 'Resolved' }
+                ];
+            }
+            // complaint
+            return [
+                { value: 'in-progress', label: 'In Progress' },
+                { value: 'rejected', label: 'Rejected' },
+                { value: 'resolved', label: 'Resolved' }
+            ];
+        }
+
+        // Update complaint status
+        function updateComplaintStatus(complaintId) {
+            const newStatus = document.getElementById(`status-${complaintId}`).value;
+            const complaint = complaints.find(c => c.id === complaintId);
+            if (complaint) {
+                complaint.status = newStatus;
+                complaint.lastUpdated = new Date();
+                displayAdminLists();
+                updateAdminStats();
+                alert(`Submission ${complaintId} status updated to: ${newStatus.replace('-', ' ')}`);
+            }
+        }
+
+        // Helper functions
+        function getCategoryLabel(category) {
+            const labels = {
+                'road-maintenance': '🛣️ Road Maintenance',
+                'water-supply': '💧 Water Supply',
+                'garbage-collection': '🗑️ Garbage Collection',
+                'street-lighting': '💡 Street Lighting',
+                'drainage': '🌊 Drainage Issues',
+                'public-transport': '🚌 Public Transport',
+                'noise-pollution': '🔊 Noise Pollution',
+                'other': '📋 Other'
+            };
+            return labels[category] || category || '';
+        }
+        function getDepartmentLabel(dept) {
+            const labels = {
+                'revenue': '🏢 Revenue Department', 'rural-development': '🏡 Rural Development & Panchayat Raj',
+                'municipal-administration': '🏙️ Municipal Administration', 'public-works': '🏗️ Public Works (PWD)',
+                'highways': '🛣️ Highways', 'health': '🏥 Health & Family Welfare', 'school-education': '🎒 School Education',
+                'higher-education': '🎓 Higher Education', 'social-welfare': '🤝 Social Welfare', 'agriculture': '🌾 Agriculture',
+                'horticulture': '🌱 Horticulture', 'animal-husbandry': '🐄 Animal Husbandry', 'forest': '🌳 Forest', 'police': '👮 Police',
+                'fire-rescue': '🚒 Fire & Rescue', 'electricity': '⚡ TANGEDCO (Electricity)', 'transport': '🚌 Transport',
+                'registration': '📝 Registration', 'other': '📋 Other'
+            };
+            return labels[dept] || dept || '';
+        }
+        function getUrgencyLabel(urgency) { const labels = { 'low': '🟢 Low', 'medium': '🟡 Medium', 'high': '🔴 High' }; return labels[urgency] || urgency; }
+
+        function updateStats() {
+            const stats = complaints.reduce((acc, c) => { acc[c.status] = (acc[c.status] || 0) + 1; return acc; }, {});
+            document.getElementById('pending-count').textContent = stats.pending || 0;
+            document.getElementById('progress-count').textContent = stats['in-progress'] || 0;
+            document.getElementById('resolved-count').textContent = stats.resolved || 0;
+            document.getElementById('rejected-count').textContent = stats.rejected || 0;
+        }
+
+        function updateAdminStats() {
+            const stats = complaints.reduce((acc, c) => { acc[c.status] = (acc[c.status] || 0) + 1; return acc; }, {});
+            document.getElementById('admin-pending-count')?.textContent !== undefined && (document.getElementById('admin-pending-count').textContent = stats.pending || 0);
+            document.getElementById('admin-progress-count')?.textContent !== undefined && (document.getElementById('admin-progress-count').textContent = stats['in-progress'] || 0);
+            document.getElementById('admin-resolved-count')?.textContent !== undefined && (document.getElementById('admin-resolved-count').textContent = stats.resolved || 0);
+            document.getElementById('admin-rejected-count')?.textContent !== undefined && (document.getElementById('admin-rejected-count').textContent = stats.rejected || 0);
+        }
+
+        function setAdminTab(tab) {
+            adminTab = tab;
+            document.getElementById('tab-complaints').classList.toggle('active', tab === 'complaints');
+            document.getElementById('tab-petitions').classList.toggle('active', tab === 'petitions');
+            document.getElementById('admin-complaints-panel').classList.toggle('hidden', tab !== 'complaints');
+            document.getElementById('admin-petitions-panel').classList.toggle('hidden', tab !== 'petitions');
+            displayAdminLists();
+        }
+
+        function displayAdminLists() {
+            if (!isAdmin) return;
+            displayComplaints('admin-complaints-list', true, { typeFilter: 'complaint' });
+            displayComplaints('admin-petitions-list', true, { typeFilter: 'petition' });
+        }
+
+        // Add event listeners for filters
+        function setupFilters() {
+            const publicFilters = ['category-filter', 'status-filter', 'search-box'];
+            publicFilters.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', () => displayComplaints('complaints-list')); el.addEventListener('input', () => displayComplaints('complaints-list')); }
+            });
+
+            // Admin filters
+            const adminComplaintFilters = ['admin-category-filter', 'admin-complaint-status-filter', 'admin-complaint-search-box'];
+            adminComplaintFilters.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', displayAdminLists); el.addEventListener('input', displayAdminLists); }
+            });
+            const adminPetitionFilters = ['admin-department-filter', 'admin-petition-status-filter', 'admin-petition-search-box'];
+            adminPetitionFilters.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', displayAdminLists); el.addEventListener('input', displayAdminLists); }
+            });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSampleData();
+            setupTypeToggle();
+            setupLocationDropdowns();
+            setupAdminLocationDropdowns();
+            setupFilters();
+            showSection('public');
+        });
+    </script>
+</body>
+</html>
