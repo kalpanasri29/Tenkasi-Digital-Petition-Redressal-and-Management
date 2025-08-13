@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: tenkasi-portal
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: tenkasi-db
+        property: connectionString
+      - key: PGSSLMODE
+        value: require
+    autoDeploy: true
+    healthCheckPath: /health
+    
+  - type: static
+    name: tenkasi-portal-static
+    env: static
+    buildCommand: ''
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+
+databases:
+  - name: tenkasi-db
+    plan: free

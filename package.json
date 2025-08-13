@@ -1,0 +1,23 @@
+{
+  "name": "tenkasi-digital-petition-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tenkasi District Administration - Digital Petition Redressal and Management Portal",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
