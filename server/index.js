@@ -19,8 +19,8 @@ app.get('/health', async (req, res) => {
   res.json({ ok: true, dbOk });
 });
 
-// Bootstrap tables
-const bootstrapSql = `
+// Bootstrap tables (compatible across Postgres versions)
+const createSubmissionsSql = `
 create table if not exists submissions (
   id text primary key,
   type text not null check (type in ('complaint','petition')),
@@ -38,19 +38,41 @@ create table if not exists submissions (
   photos jsonb default '[]'::jsonb,
   timestamp timestamptz not null default now(),
   last_updated timestamptz not null default now()
-);
+)`;
+
+const createOfficialsSql = `
 create table if not exists officials (
   id serial primary key,
   username text unique not null,
   password text not null
-);
--- history of updates and resolved timestamp
-alter table submissions add column if not exists history jsonb default '[]'::jsonb;
-alter table submissions add column if not exists resolved_at timestamptz;
-`;
+)`;
+
+const ensureHistorySql = `
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'submissions' AND column_name = 'history'
+  ) THEN
+    ALTER TABLE submissions ADD COLUMN history jsonb DEFAULT '[]'::jsonb;
+  END IF;
+END $$;`;
+
+const ensureResolvedAtSql = `
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'submissions' AND column_name = 'resolved_at'
+  ) THEN
+    ALTER TABLE submissions ADD COLUMN resolved_at timestamptz;
+  END IF;
+END $$;`;
 
 async function bootstrap() {
-  await pool.query(bootstrapSql);
+  // run sequentially to avoid multi-statement parser issues
+  await pool.query(createSubmissionsSql);
+  await pool.query(createOfficialsSql);
+  await pool.query(ensureHistorySql);
+  await pool.query(ensureResolvedAtSql);
   // Seed official if not exists
   const r = await pool.query('select 1 from officials where username=$1', ['Tenkasi Admin']);
   if (r.rowCount === 0) {
