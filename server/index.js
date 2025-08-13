@@ -100,7 +100,11 @@ app.get('/api/submissions/lookup', async (req, res) => {
   const { id, phone } = req.query;
   if (!id || !phone) return res.status(400).json({ ok: false, error: 'id and phone required' });
   try {
-    const r = await pool.query('select * from submissions where lower(id)=lower($1) and replace(phone,\'\',\'\') like concat(\'%', right($2, 10)) limit 1', [id, phone]);
+    const sql = `select * from submissions
+      where lower(id) = lower($1)
+        and right(regexp_replace(phone, '\\D', '', 'g'), 10) = right(regexp_replace($2, '\\D', '', 'g'), 10)
+      limit 1`;
+    const r = await pool.query(sql, [id, phone]);
     res.json(r.rows[0] || null);
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -112,7 +116,7 @@ app.post('/api/submissions/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status, response } = req.body;
   try {
-    await pool.query('update submissions set status=$1, last_updated=now(), description = case when $2 is not null then description || E"\n\n--- Official Response ---\n" || $2 else description end where id=$3', [status, response || null, id]);
+    await pool.query("update submissions set status=$1, last_updated=now(), description = case when $2 is not null then description || E'\\n\\n--- Official Response ---\\n' || $2 else description end where id=$3", [status, response || null, id]);
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
