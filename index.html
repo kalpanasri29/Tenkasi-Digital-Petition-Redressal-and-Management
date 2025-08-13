@@ -608,8 +608,8 @@
             const status = document.getElementById(`st-${id}`).value;
             const response = document.getElementById(`resp-${id}`).value.trim();
             await setStatus(id, status, response || null);
-            await displayAdminList();
-            await loadDcdmList();
+            // After update, fetch again from server to ensure fresh data
+            await Promise.all([displayAdminList(), loadDcdmList()]);
             alert(`Updated ${id} to ${status}`);
         }
 

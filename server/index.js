@@ -6,6 +6,13 @@ const { Pool } = require('pg');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+// Disable caching across responses to ensure fresh data after updates
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
