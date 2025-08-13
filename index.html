@@ -431,6 +431,13 @@
             const labelVal = item.type==='petition' ? getDepartmentLabel(item.department) : getCategoryLabel(item.category);
             const photos = (item.photos||[]).map(src=>`<img src="${src}" style="width:80px;height:60px;object-fit:cover;border:1px solid #eee;border-radius:6px;margin-right:6px;">`).join('');
             const statusBadge = `<span class="status-badge status-${item.status}">${item.status.replace('-',' ')}</span>`;
+            const history = (item.history || []).map(h => {
+                const ts = new Date(h.timestamp || h.ts || Date.now()).toLocaleString();
+                const st = (h.status || '').replace('-', ' ');
+                const resp = h.response ? ` — ${h.response}` : '';
+                return `<div style="font-size:12px;color:#4b5563;">${ts}: ${st}${resp}</div>`;
+            }).join('');
+            const resolved = item.resolved_at ? `<div style="font-size:12px;color:#065f46;">Resolved at: ${new Date(item.resolved_at).toLocaleString()}</div>` : '';
             const controls = showOfficialControls ? `
                 <div class="form-inline" style="margin-top:8px;">
                     <select id="st-${item.id}" class="filter-select">
@@ -454,6 +461,8 @@
                 </div>
                 <div style="margin-top:6px;"><strong>Description:</strong><br>${item.description}</div>
                 ${photos?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${photos}</div>`:''}
+                ${resolved}
+                ${history?`<div style=\"margin-top:8px;\"><strong>History:</strong><div style=\"margin-top:4px;display:flex;flex-direction:column;gap:2px;\">${history}</div></div>`:''}
                 ${controls}
             </div>`;
         }
@@ -557,7 +566,10 @@
             const vil = document.getElementById('dcdm-village-filter').value; if(vil) params.village=vil;
             const q = document.getElementById('dcdm-search').value.trim(); if(q) params.q=q;
             const items = await listSubmissions(params);
-            document.getElementById('dcdm-list').innerHTML = items.map(x=>buildCard(x,false)).join('');
+            const active = items.filter(x => x.status !== 'resolved');
+            const resolved = items.filter(x => x.status === 'resolved');
+            const resolvedBlock = resolved.length ? `<div class=\"card\" style=\"background:#f9fafb\"><h3 style=\"margin-bottom:8px;color:#065f46\">Resolved</h3>${resolved.map(x=>buildCard(x,false)).join('')}</div>` : '';
+            document.getElementById('dcdm-list').innerHTML = active.map(x=>buildCard(x,false)).join('') + resolvedBlock;
         }
 
         // Admin login
@@ -585,7 +597,11 @@
             const vil = document.getElementById('admin-village-select').value; if(vil) params.village=vil;
             const q = document.getElementById('admin-search-box').value.trim(); if(q) params.q=q;
             const items = await listSubmissions(params);
-            document.getElementById('admin-complaints-list').innerHTML = items.map(x=>buildCard(x,true)).join('');
+            // group resolved separately
+            const active = items.filter(x => x.status !== 'resolved');
+            const resolved = items.filter(x => x.status === 'resolved');
+            const resolvedBlock = resolved.length ? `<div class=\"card\" style=\"background:#f9fafb\"><h3 style=\"margin-bottom:8px;color:#065f46\">Resolved</h3>${resolved.map(x=>buildCard(x,true)).join('')}</div>` : '';
+            document.getElementById('admin-complaints-list').innerHTML = active.map(x=>buildCard(x,true)).join('') + resolvedBlock;
         }
 
         async function updateStatus(id){

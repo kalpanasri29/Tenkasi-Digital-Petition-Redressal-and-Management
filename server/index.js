@@ -44,6 +44,9 @@ create table if not exists officials (
   username text unique not null,
   password text not null
 );
+-- history of updates and resolved timestamp
+alter table if not exists submissions add column if not exists history jsonb default '[]'::jsonb;
+alter table if not exists submissions add column if not exists resolved_at timestamptz;
 `;
 
 async function bootstrap() {
@@ -65,6 +68,15 @@ app.post('/api/submissions', async (req, res) => {
       `insert into submissions (id, type, name, phone, email, department, category, taluk, firka, village, description, urgency, status, photos, timestamp, last_updated)
        values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,now(),now())`,
       [id, s.type, s.name, s.phone, s.email || null, s.department || null, s.category || null, s.taluk, s.firka, s.village, s.description, s.urgency, s.status || 'pending', JSON.stringify(s.photos || [])]
+    );
+    // append initial history event
+    await pool.query(
+      `update submissions
+         set history = coalesce(history, '[]'::jsonb) || jsonb_build_array(
+             jsonb_build_object('timestamp', now(), 'status', $1, 'response', null)
+         )
+       where id = $2`,
+      [s.status || 'pending', id]
     );
     res.json({ ok: true, id });
   } catch (e) {
@@ -116,7 +128,10 @@ app.post('/api/submissions/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status, response } = req.body;
   try {
-    await pool.query("update submissions set status=$1, last_updated=now(), description = case when $2 is not null then description || E'\\n\\n--- Official Response ---\\n' || $2 else description end where id=$3", [status, response || null, id]);
+    await pool.query(
+      "update submissions set status=$1, last_updated=now(), description = case when $2 is not null then description || E'\\n\\n--- Official Response ---\\n' || $2 else description end, history = coalesce(history, '[]'::jsonb) || jsonb_build_array(jsonb_build_object('timestamp', now(), 'status', $1, 'response', $2)), resolved_at = case when $1='resolved' then now() else resolved_at end where id=$3",
+      [status, response || null, id]
+    );
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
