@@ -127,7 +127,7 @@ app.get('/api/submissions', async (req, res) => {
   if (firka) add('firka = $i', firka);
   if (village) add('village = $i', village);
   if (q) { params.push('%' + q.toLowerCase() + '%'); clauses.push('(lower(id) like $' + params.length + ' or lower(description) like $' + params.length + ')'); }
-  const sql = `select * from submissions ${clauses.length ? 'where ' + clauses.join(' and ') : ''} order by timestamp desc limit 500`;
+  const sql = `select * from submissions ${clauses.length ? 'where ' + clauses.join(' and ') : ''} order by last_updated desc, timestamp desc limit 500`;
   try {
     const r = await pool.query(sql, params);
     res.json(r.rows);

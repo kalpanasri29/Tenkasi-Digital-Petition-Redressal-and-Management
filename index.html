@@ -609,7 +609,7 @@
             const response = document.getElementById(`resp-${id}`).value.trim();
             await setStatus(id, status, response || null);
             // After update, fetch again from server to ensure fresh data
-            await Promise.all([displayAdminList(), loadDcdmList()]);
+            await Promise.all([displayAdminList(), loadDcdmList(), trackByPhoneAndId().catch(()=>{})]);
             alert(`Updated ${id} to ${status}`);
         }
 
