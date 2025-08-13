@@ -18,6 +18,9 @@
         .nav-btn.accent { background: linear-gradient(45deg, #ffd7ba, #ffbfa3); color: #6b3a1e; border: 1px solid #ffc6a8; }
         .nav-btn.secondary { background: rgba(255, 255, 255, 0.2); color: #2c3e50; border: 2px solid rgba(255, 255, 255, 0.3); }
         .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,.2); }
+        .lang-toggle { position: absolute; right: 16px; top: 16px; display: flex; gap: 6px; }
+        .lang-btn { padding: 6px 10px; border-radius: 16px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .lang-btn.active { background: #111827; color: #fff; border-color: #111827; }
         .card { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(8px); border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,.08); }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
@@ -53,44 +56,48 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏛️ Tenkasi District Administration</h1>
-            <p>Digital Petition Redressal Mechanism</p>
+            <div class="lang-toggle">
+                <button id="lang-en" class="lang-btn active" onclick="setLang('en')">English</button>
+                <button id="lang-ta" class="lang-btn" onclick="setLang('ta')">தமிழ்</button>
+            </div>
+            <h1 data-i18n="title">🏛️ Tenkasi District Administration</h1>
+            <p data-i18n="tagline">Digital Petition Redressal Mechanism</p>
             <div class="nav-buttons">
-                <button class="nav-btn primary" onclick="showSection('public')">📝 File Petition/Complaint</button>
-                <button class="nav-btn secondary" onclick="showSection('track')">🔎 Track Petition/Complaint</button>
-                <button class="nav-btn warning" onclick="showSection('dcdm-login')">🏢 DC/DM Login</button>
-                <button class="nav-btn accent" onclick="showSection('admin-login')">🔐 Official Login</button>
+                <button class="nav-btn primary" onclick="showSection('public')" data-i18n="nav.file">📝 File Petition/Complaint</button>
+                <button class="nav-btn secondary" onclick="showSection('track')" data-i18n="nav.track">🔎 Track Petition/Complaint</button>
+                <button class="nav-btn warning" onclick="showSection('dcdm-login')" data-i18n="nav.dcdm">🏢 DC/DM Login</button>
+                <button class="nav-btn accent" onclick="showSection('admin-login')" data-i18n="nav.official">🔐 Official Login</button>
             </div>
         </div>
 
         <!-- Public Form -->
         <div id="public-section" class="card">
-            <h2 style="margin-bottom: 16px; color: #2c3e50;">📝 New Petition/Complaint</h2>
+            <h2 style="margin-bottom: 16px; color: #2c3e50;" data-i18n="form.title">📝 New Petition/Complaint</h2>
             <form id="complaint-form">
                 <div class="form-group">
-                    <label>Submission Type</label>
+                    <label data-i18n="form.type">Submission Type</label>
                     <div class="type-toggle">
-                        <button type="button" id="btn-complaint" class="type-btn active" onclick="setType('complaint')">Civic Complaint</button>
-                        <button type="button" id="btn-petition" class="type-btn" onclick="setType('petition')">Petition</button>
+                        <button type="button" id="btn-complaint" class="type-btn active" onclick="setType('complaint')" data-i18n="form.civic">Civic Complaint</button>
+                        <button type="button" id="btn-petition" class="type-btn" onclick="setType('petition')" data-i18n="form.petition">Petition</button>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="complainant-name">Your Name</label>
+                    <label for="complainant-name" data-i18n="form.name">Your Name</label>
                     <input type="text" id="complainant-name" required>
                 </div>
                 <div class="form-group">
-                    <label for="complainant-phone">Phone Number</label>
+                    <label for="complainant-phone" data-i18n="form.phone">Phone Number</label>
                     <input type="tel" id="complainant-phone" required placeholder="Enter your mobile number">
                     <div class="hint">Only one submission is allowed per phone number in a 7-day period.</div>
                 </div>
                 <div class="form-group">
-                    <label for="complainant-email">Email Address</label>
+                    <label for="complainant-email" data-i18n="form.email">Email Address</label>
                     <input type="email" id="complainant-email" placeholder="Optional">
                 </div>
 
                 <div class="form-group" id="category-group">
-                    <label for="complaint-category">Category (for Civic Complaint)</label>
+                    <label for="complaint-category" data-i18n="form.category">Category (for Civic Complaint)</label>
                     <select id="complaint-category">
                         <option value="">Select Category</option>
                         <option value="road-maintenance">🛣️ Road Maintenance</option>
@@ -104,7 +111,7 @@
                     </select>
                 </div>
                 <div class="form-group hidden" id="department-group">
-                    <label for="petition-department">Department (for Petition)</label>
+                    <label for="petition-department" data-i18n="form.department">Department (for Petition)</label>
                     <select id="petition-department">
                         <option value="">Select Department</option>
                         <option value="revenue">🏢 Revenue Department</option>
@@ -130,7 +137,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Location</label>
+                    <label data-i18n="form.location">Location</label>
                     <div class="form-inline">
                         <select id="taluk-select" required><option value="">Select Taluk</option></select>
                         <select id="firka-select" required disabled><option value="">Select Firka</option></select>
@@ -139,18 +146,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="complaint-description">Detailed Description</label>
+                    <label for="complaint-description" data-i18n="form.description">Detailed Description</label>
                     <textarea id="complaint-description" placeholder="Provide detailed information..." required></textarea>
                 </div>
 
                 <div id="photos-section" class="form-group">
-                    <label>Photos (for Civic Complaint)</label>
+                    <label data-i18n="form.photos">Photos (for Civic Complaint)</label>
                     <input type="file" id="photo-input" accept="image/*" multiple>
                     <div id="photo-preview" class="photo-grid" style="margin-top:10px;"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="urgency-level">Urgency Level</label>
+                    <label for="urgency-level" data-i18n="form.urgency">Urgency Level</label>
                     <select id="urgency-level" required>
                         <option value="low">🟢 Low</option>
                         <option value="medium">🟡 Medium</option>
@@ -231,7 +238,7 @@
 
         <!-- Citizen Track (Phone + ID) -->
         <div id="track-section" class="card hidden">
-            <h2 style="margin-bottom: 12px; color:#2c3e50;">🔎 Track Petition/Complaint</h2>
+            <h2 style="margin-bottom: 12px; color:#2c3e50;" data-i18n="track.title">🔎 Track Petition/Complaint</h2>
             <div class="form-inline" style="grid-template-columns: 1fr 1fr auto auto;">
                 <input type="tel" id="track-phone" placeholder="Phone number" required>
                 <input type="text" id="track-id" placeholder="Reference ID (e.g., CMP004)" required>
@@ -245,6 +252,27 @@
     <script>
         // API base
         const API = '';
+        let LANG = 'en';
+        const I18N = {
+            en: {
+                title: '🏛️ Tenkasi District Administration',
+                tagline: 'Digital Petition Redressal Mechanism',
+                nav: { file: '📝 File Petition/Complaint', track: '🔎 Track Petition/Complaint', dcdm: '🏢 DC/DM Login', official: '🔐 Official Login' },
+                form: { title: '📝 New Petition/Complaint', type: 'Submission Type', civic: 'Civic Complaint', petition: 'Petition', name: 'Your Name', phone: 'Phone Number', email: 'Email Address', category: 'Category (for Civic Complaint)', department: 'Department (for Petition)', location: 'Location', description: 'Detailed Description', photos: 'Photos (for Civic Complaint)', urgency: 'Urgency Level' },
+                track: { title: '🔎 Track Petition/Complaint' }
+            },
+            ta: {
+                title: '🏛️ தென்காசி மாவட்ட ஆட்சி',
+                tagline: 'மின்னணு மனு தீர்வு அமைப்பு',
+                nav: { file: '📝 மனு/புகார் சமர்ப்பிக்க', track: '🔎 மனு/புகார் கண்காணிக்க', dcdm: '🏢 ஆட்சியர் உள்நுழைவு', official: '🔐 அதிகாரி உள்நுழைவு' },
+                form: { title: '📝 புதிய மனு/புகார்', type: 'சமர்ப்பிப்பு வகை', civic: 'சிவிக் புகார்', petition: 'மனு', name: 'பெயர்', phone: 'தொலைபேசி எண்', email: 'மின்னஞ்சல்', category: 'புகார் வகை', department: 'துறை (மனு)', location: 'இடம்', description: 'விரிவான விளக்கம்', photos: 'புகைப்படங்கள் (புகார்)', urgency: 'அவசர நிலை' },
+                track: { title: '🔎 மனு/புகார் கண்காணிக்க' }
+            }
+        };
+        function setLang(lang){ LANG = lang; document.getElementById('lang-en').classList.toggle('active', lang==='en'); document.getElementById('lang-ta').classList.toggle('active', lang==='ta');
+            const dict = I18N[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el=>{ const key = el.getAttribute('data-i18n'); const parts = key.split('.'); let val = dict; parts.forEach(p=>{ if (val) val = val[p]; }); if (val) el.innerText = val; });
+        }
         let currentType = 'complaint';
         let isAdmin = false;
         const SUBMISSIONS_KEY = 'tenkasi_submissions_by_phone_v1';
@@ -612,7 +640,7 @@
             setupAdmin();
             showSection('public');
         }
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', ()=>{ init(); setLang('en'); });
     </script>
 </body>
 </html>
