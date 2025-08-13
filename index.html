@@ -47,6 +47,9 @@
         .status-rejected { background: #f8d7da; color: #721c24; border: 1px solid #e74c3c; }
         .status-validating { background: #e8f0fe; color: #1a73e8; border: 1px solid #bcd2ff; }
         .status-accepted { background: #e6fffa; color: #0d9488; border: 1px solid #99f6e4; }
+        .card.status-resolved { background: #f1f5f9; }
+        .card.status-in-progress { border-left: 4px solid #3498db; }
+        .card.status-rejected { border-left: 4px solid #e74c3c; }
         .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .update-btn { background: #3498db; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .update-btn.secondary { background: #6b7280; }
@@ -430,7 +433,7 @@
             const labelName = item.type==='petition' ? 'Department' : 'Category';
             const labelVal = item.type==='petition' ? getDepartmentLabel(item.department) : getCategoryLabel(item.category);
             const photos = (item.photos||[]).map(src=>`<img src="${src}" style="width:80px;height:60px;object-fit:cover;border:1px solid #eee;border-radius:6px;margin-right:6px;">`).join('');
-            const statusBadge = `<span class="status-badge status-${item.status}">${item.status.replace('-',' ')}</span>`;
+            const statusBadge = `<span class="status-badge status-${item.status}">${(item.status || '').replace(/-/g,' ')}</span>`;
             const history = (item.history || []).map(h => {
                 const ts = new Date(h.timestamp || h.ts || Date.now()).toLocaleString();
                 const st = (h.status || '').replace('-', ' ');
@@ -440,15 +443,15 @@
             const resolved = item.resolved_at ? `<div style="font-size:12px;color:#065f46;">Resolved at: ${new Date(item.resolved_at).toLocaleString()}</div>` : '';
             const controls = showOfficialControls ? `
         <div class="form-inline" style="margin-top:8px;">
-            <select id="st-${item.id}" class="filter-select">
+            <select id="st-${item.id}" class="filter-select" onchange="(function(sel){ const btn=document.querySelector('#item-${item.id} .update-btn'); if(btn){ const opt=sel.options[sel.selectedIndex]; btn.textContent='Update to ' + opt.text; } })(this)">
                 ${getStatusOptions(item.type).map(s=>`<option value="${s.value}" ${item.status===s.value?'selected':''}>${s.label}</option>`).join('')}
             </select>
             <input type="text" id="resp-${item.id}" class="filter-select" placeholder="Acknowledgement / Response (optional)">
-            <button class="update-btn" onclick="updateStatus('${item.id}')">Update</button>
+            <button class=\"update-btn\" onclick=\"updateStatus('${item.id}')\">Update to ${getStatusOptions(item.type).find(s=>s.value===item.status)?.label || 'Selected Status'} </button>
             <button class="update-btn secondary" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button>
         </div>
         <div id="live-${item.id}" style="margin-top:8px;"></div>` : `<div style="margin-top:8px;"><button class="update-btn" onclick="downloadAcknowledgement('${item.id}')">Download Acknowledgement</button></div>`;
-            return `<div class="card" id="item-${item.id}">
+            return `<div class=\"card status-${item.status}\" id=\"item-${item.id}\">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                     <div style="font-weight:700;color:#2c3e50;">${item.id}</div>
                     ${statusBadge}
@@ -467,9 +470,11 @@
                 ${controls}
             </div>`;
         }
-        function getStatusOptions(type){ return type==='petition' ? [
-            {value:'in-progress',label:'In Progress'},{value:'validating',label:'Validating'},{value:'accepted',label:'Accepted'},{value:'resolved',label:'Resolved'}
-        ] : [ {value:'in-progress',label:'In Progress'},{value:'rejected',label:'Rejected'},{value:'resolved',label:'Resolved'} ]; }
+        function getStatusOptions(type){ const base = [{value:'pending',label:'Pending'}];
+            if (type==='petition') return base.concat([
+                {value:'in-progress',label:'In Progress'},{value:'validating',label:'Validating'},{value:'accepted',label:'Accepted'},{value:'resolved',label:'Resolved'}
+            ]);
+            return base.concat([{value:'in-progress',label:'In Progress'},{value:'rejected',label:'Rejected'},{value:'resolved',label:'Resolved'}]); }
 
         async function createSubmission(payload){
             await fetch(`${API}/api/submissions`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
