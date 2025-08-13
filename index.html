@@ -174,7 +174,7 @@
         <div id="dcdm-login-section" class="card hidden">
             <h2 style="margin-bottom: 12px; color:#2c3e50;">🏢 DC/DM Login</h2>
             <form id="dcdm-login-form" class="form-inline" style="grid-template-columns: 1fr auto;">
-                <input type="password" id="dcdm-pin" placeholder="Enter Unique PIN" value="qdguckebg461293" required>
+                <input type="password" id="dcdm-pin" placeholder="Enter Unique PIN" required>
                 <button class="update-btn" type="submit">Login</button>
             </form>
             <div id="dcdm-panel" class="hidden" style="margin-top:16px;">
@@ -209,11 +209,11 @@
                 <form id="admin-login-form">
                     <div class="form-group">
                         <label for="admin-username">Username</label>
-                        <input type="text" id="admin-username" value="Tenkasi Admin" required>
+                        <input type="text" id="admin-username" placeholder="Username" required>
                     </div>
                     <div class="form-group">
                         <label for="admin-password">Password</label>
-                        <input type="password" id="admin-password" value="efvhuytgbnmki493401" required>
+                        <input type="password" id="admin-password" placeholder="Password" required>
                     </div>
                     <button type="submit" class="submit-btn">Login</button>
                 </form>
@@ -481,7 +481,7 @@
         function showSection(section){
             ['public','dcdm-login','admin-login','admin','track'].forEach(s=>document.getElementById(`${s}-section`).classList.add('hidden'));
             document.getElementById(`${section}-section`).classList.remove('hidden');
-            if(section==='admin') displayAdminList();
+            if(section==='admin') displayAdminList(); if(section==='dcdm-login') loadDcdmList();
         }
 
         // Form submit
@@ -593,6 +593,7 @@
             const response = document.getElementById(`resp-${id}`).value.trim();
             await setStatus(id, status, response || null);
             await displayAdminList();
+            await loadDcdmList();
             alert(`Updated ${id} to ${status}`);
         }
 
