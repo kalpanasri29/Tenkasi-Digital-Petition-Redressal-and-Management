@@ -8,12 +8,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: #333; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); position: relative; }
         .header h1 { color: #2c3e50; margin-bottom: 10px; font-size: 2.2em; font-weight: 700; }
         .header p { color: #7f8c8d; font-size: 1.05em; }
         .nav-buttons { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
         .nav-btn { padding: 12px 25px; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 14px; }
         .nav-btn.primary { background: linear-gradient(45deg, #3498db, #2980b9); color: white; }
+        .nav-btn.warning { background: linear-gradient(45deg, #fbd38d, #f6ad55); color: #5a3e00; border: 1px solid #f6ad55; }
+        .nav-btn.accent { background: linear-gradient(45deg, #ffd7ba, #ffbfa3); color: #6b3a1e; border: 1px solid #ffc6a8; }
         .nav-btn.secondary { background: rgba(255, 255, 255, 0.2); color: #2c3e50; border: 2px solid rgba(255, 255, 255, 0.3); }
         .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,.2); }
         .card { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(8px); border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0,0,0,.08); }
@@ -56,8 +58,8 @@
             <div class="nav-buttons">
                 <button class="nav-btn primary" onclick="showSection('public')">📝 File Petition/Complaint</button>
                 <button class="nav-btn secondary" onclick="showSection('track')">🔎 Track Petition/Complaint</button>
-                <button class="nav-btn secondary" onclick="showSection('dcdm-login')">🏢 DC/DM Login</button>
-                <button class="nav-btn secondary" onclick="showSection('admin-login')">🔐 Official Login</button>
+                <button class="nav-btn warning" onclick="showSection('dcdm-login')">🏢 DC/DM Login</button>
+                <button class="nav-btn accent" onclick="showSection('admin-login')">🔐 Official Login</button>
             </div>
         </div>
 
