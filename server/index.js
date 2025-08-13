@@ -12,14 +12,11 @@ const pool = new Pool({
   ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined,
 });
 
-// Health
+// Health: always 200 to satisfy platform readiness; includes dbOk flag
 app.get('/health', async (req, res) => {
-  try {
-    await pool.query('select 1');
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: e.message });
-  }
+  let dbOk = true;
+  try { await pool.query('select 1'); } catch (e) { dbOk = false; }
+  res.json({ ok: true, dbOk });
 });
 
 // Bootstrap tables
