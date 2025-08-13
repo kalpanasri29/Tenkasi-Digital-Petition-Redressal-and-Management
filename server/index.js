@@ -45,8 +45,8 @@ create table if not exists officials (
   password text not null
 );
 -- history of updates and resolved timestamp
-alter table if not exists submissions add column if not exists history jsonb default '[]'::jsonb;
-alter table if not exists submissions add column if not exists resolved_at timestamptz;
+alter table submissions add column if not exists history jsonb default '[]'::jsonb;
+alter table submissions add column if not exists resolved_at timestamptz;
 `;
 
 async function bootstrap() {
