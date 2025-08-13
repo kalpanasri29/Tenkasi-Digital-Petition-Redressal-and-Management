@@ -621,7 +621,14 @@
                 live.innerHTML = `<div class=\"ack\"><div><strong>Updated:</strong> ${latest.status.replace('-', ' ')}</div><div>${latest.history?.length ? 'Events: '+latest.history.length : ''}</div></div>`;
             }
             // After update, fetch again from server to ensure fresh data
-            await Promise.all([displayAdminList(), loadDcdmList(), trackByPhoneAndId().catch(()=>{})]);
+            const tasks = [displayAdminList(), loadDcdmList()];
+            const trackSection = document.getElementById('track-section');
+            const phoneEl = document.getElementById('track-phone');
+            const idEl = document.getElementById('track-id');
+            if (trackSection && !trackSection.classList.contains('hidden') && phoneEl && idEl && phoneEl.value.trim() && idEl.value.trim()) {
+                tasks.push(trackByPhoneAndId());
+            }
+            await Promise.all(tasks);
         }
 
         async function trackByPhoneAndId(){
